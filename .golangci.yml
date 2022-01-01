@@ -1,0 +1,31 @@
+# https://github.com/golangci/golangci-lint#config-file
+
+issues:
+  exclude:
+    - Using the variable on range scope .* in function literal
+
+  exclude-rules:
+    - path: .go
+      text: .*could not import*
+
+linters:
+  enable:
+    - govet
+    - errcheck
+    - gosec
+    - nilerr
+    - noctx
+    - exportloopref
+    - staticcheck
+    - nestif
+    - goerr113
+    - gocritic
+    - bodyclose
+    - structcheck
+    - wsl
+    - makezero
+    - deadcode
+    - unparam
+    - unused
+    - varcheck
+  fast: false
