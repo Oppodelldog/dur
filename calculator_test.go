@@ -69,6 +69,9 @@ func TestCalculator_Calculate(t *testing.T) {
 		{name: "be aware of floating precision", input: "3.01s + 0s", want: "3.009999999s"},
 
 		{name: "multiple value concat", input: "1h30m", want: "1h30m0s"},
+		{name: "multiple value concat in subtraction", input: "10h - 1h30m", want: "8h30m0s"},
+		{name: "multiple value concat in subtraction", input: "2h-1h30m-10m2m2m60s+20m2m2m60s-20m", want: "20m0s"},
+
 		{name: "empty", input: "", want: ""},
 	}
 

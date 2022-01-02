@@ -69,7 +69,9 @@ func (i *Calculator) Calculate() string {
 		}
 
 		if i.tokenType() == TypeValue {
-			op = TypePlus
+			if op == TypeEmpty {
+				op = TypePlus
+			}
 			v2 = i.duration()
 		} else {
 			op = i.operation()
@@ -79,12 +81,14 @@ func (i *Calculator) Calculate() string {
 		switch op {
 		case TypePlus:
 			vr := v1 + v2
-			i.p.print(v1, v2, vr, "+")
+			i.p.print(v1, v2, vr, string(plus))
 			v1 = vr
 		case TypeMinus:
 			vr := v1 - v2
-			i.p.print(v1, v2, vr, "-")
+			i.p.print(v1, v2, vr, string(minus))
 			v1 = vr
+		default:
+			panic(fmt.Sprintf("unknown operation '%v'", op))
 		}
 	}
 

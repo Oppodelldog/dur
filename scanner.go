@@ -12,6 +12,8 @@ const (
 	TypeMinus      TokenType = "MINUS"
 
 	TypeValue = "VALUE"
+
+	TypeEmpty = ""
 )
 
 const (
