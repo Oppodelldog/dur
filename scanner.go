@@ -10,6 +10,8 @@ const (
 	TypeWhitespace TokenType = "WHITESPACE"
 	TypePlus       TokenType = "PLUS"
 	TypeMinus      TokenType = "MINUS"
+	TypeParenOpen  TokenType = "PAREN_OPEN"
+	TypeParenClose TokenType = "PAREN_CLOSE"
 
 	TypeValue = "VALUE"
 
@@ -17,9 +19,11 @@ const (
 )
 
 const (
-	minus = '-'
-	plus  = '+'
-	space = ' '
+	minus      = '-'
+	plus       = '+'
+	space      = ' '
+	parenOpen  = '('
+	parenClose = ')'
 )
 
 type TokenType string
@@ -109,6 +113,14 @@ func (s *Scanner) nextToken() Token {
 		s.nextChar()
 	case ch == plus:
 		tok = Token{Type: TypePlus}
+
+		s.nextChar()
+	case ch == parenOpen:
+		tok = Token{Type: TypeParenOpen}
+
+		s.nextChar()
+	case ch == parenClose:
+		tok = Token{Type: TypeParenClose}
 
 		s.nextChar()
 	case isDigit(ch):

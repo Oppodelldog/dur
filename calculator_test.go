@@ -69,15 +69,37 @@ func TestCalculator_Calculate(t *testing.T) {
 		{name: "be aware of floating precision", input: "3.01s + 0s", want: "3.009999999s"},
 
 		{name: "multiple value concat", input: "1h30m", want: "1h30m0s"},
-		{name: "multiple value concat in subtraction", input: "10h - 1h30m", want: "8h30m0s"},
-		{name: "multiple value concat in subtraction", input: "2h-1h30m-10m2m2m60s+20m2m2m60s-20m", want: "20m0s"},
+		{name: "multiple value concat in subtraction", input: "10h - 1h30m", want: "9h30m0s"},
 
-		{name: "empty", input: "", want: ""},
+		{name: "parentheses", input: "()", want: "0s"},
+		{name: "parentheses", input: "(1h)", want: "1h0m0s"},
+		{name: "parentheses", input: "(-1h)", want: "-1h0m0s"},
+		{name: "parentheses", input: "-(1h)", want: "-1h0m0s"},
+		{name: "parentheses", input: "-(+1h)", want: "-1h0m0s"},
+		{name: "parentheses", input: "(-1h-1h)", want: "-2h0m0s"},
+		{name: "parentheses", input: "(-1h)+(-1h)", want: "-2h0m0s"},
+		{name: "parentheses", input: "(-1h)-(-1h)", want: "0s"},
+		{name: "parentheses", input: "(-1h+-1h)", want: "-2h0m0s"},
+		{name: "parentheses", input: "(-1h-+1h)", want: "-2h0m0s"},
+		{name: "parentheses", input: "1h(())1h()1h(())", want: "3h0m0s"},
+		{name: "parentheses", input: "1h(1h(1h))", want: "3h0m0s"},
+		{name: "parentheses", input: "1h(10m)", want: "1h10m0s"},
+		{name: "parentheses", input: "1h(10m)", want: "1h10m0s"},
+		{name: "parentheses", input: "1h(10m+20m)", want: "1h30m0s"},
+		{name: "parentheses", input: "2h-(1h30m)", want: "30m0s"},
+		{name: "parentheses", input: "2h-(1h+30m)", want: "30m0s"},
+		{name: "parentheses", input: "2h-(1h+30m)", want: "30m0s"},
+		{name: "parentheses", input: "(2h-(1h+30m))", want: "30m0s"},
+		{name: "parentheses", input: "(2h)-(1h+30m)", want: "30m0s"},
+		{name: "parentheses", input: "((2h)-(1h+30m))", want: "30m0s"},
+
+		{name: "empty", input: "", want: "0s"},
+		{name: "missing operand", input: "0h+", want: "0s"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := dur.NewCalculator(tt.input).Calculate(); !reflect.DeepEqual(got, tt.want) {
+			if got := dur.NewCalculator(tt.input).Calculate().String(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Calculate() = %v, want %v", got, tt.want)
 			}
 		})
@@ -92,10 +114,18 @@ func TestCalculator_Calculate_Panics(t *testing.T) {
 	}
 
 	tests := []testCase{
-		{name: "missing operand", input: "0h+", want: "expected value, but got EOF ('')"},
 		{name: "floating nanoseconds", input: "0,1ns", want: "floating point values for unit ns is not supported"},
 		{name: "unexpected character", input: "0hh", want: "unexpected character 'h'"},
 		{name: "floating nanoseconds", input: "0,,1s", want: "expected digit, but got ','"},
+		{name: "missing end of term", input: ")", want: "unexpected closing parenthesis"},
+		{name: "unexpected end of term", input: ")1h", want: "unexpected closing parenthesis"},
+		{name: "missing begin of term", input: "1h)", want: "unexpected closing parenthesis"},
+		{name: "missing end of term", input: "(", want: "unexpected token 'EOF'"},
+		{name: "missing end of term", input: "(1h", want: "unexpected token 'EOF'"},
+		{name: "missing end of term", input: "1h(", want: "unexpected token 'EOF'"},
+		{name: "invalid operator", input: "--1h", want: "unexpected token 'MINUS'"},
+		{name: "invalid operator", input: "-+1h", want: "unexpected token 'PLUS'"},
+		{name: "parentheses", input: "1h(1h", want: "unexpected token 'EOF'"},
 	}
 
 	for _, tt := range tests {

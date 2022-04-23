@@ -14,7 +14,9 @@ func main() {
 		fs      = flag.NewFlagSet("dur", flag.ExitOnError)
 		printer = fs.String("p", "", "prints a line for each calculation that is performed.\nOutput options:\n  h - human readable\n  n - nanoseconds\nexample: -p=h")
 	)
+
 	fs.Usage = usage(fs)
+
 	var err = fs.Parse(os.Args[1:])
 
 	input := strings.Join(os.Args[len(os.Args)-fs.NArg():], "")
