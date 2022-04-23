@@ -35,6 +35,14 @@ dur is a program for calculation of durations.
 # parentheses support
 > dur "2h-(1h30m)"
 30m0s
+
+# multiplication
+> dur 5*4*12*8h
+1920h0m0s
+
+# division
+> dur 40h/5
+8h0m0s
 ```
 
 ### verbose output

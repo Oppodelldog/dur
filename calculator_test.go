@@ -93,6 +93,20 @@ func TestCalculator_Calculate(t *testing.T) {
 		{name: "parentheses", input: "(2h)-(1h+30m)", want: "30m0s"},
 		{name: "parentheses", input: "((2h)-(1h+30m))", want: "30m0s"},
 
+		{name: "multiply", input: "2*1m", want: "2m0s"},
+		{name: "multiply", input: "2*2*1m", want: "4m0s"},
+		{name: "multiply", input: "10m+20m*2", want: "1h0m0s"},
+		{name: "multiply", input: "10m*6", want: "1h0m0s"},
+		{name: "multiply", input: "10m*2+40m", want: "1h0m0s"},
+
+		{name: "divide", input: "2/1*1m", want: "2m0s"},
+		{name: "divide", input: "1m/2", want: "30s"},
+		{name: "divide", input: "1h/4", want: "15m0s"},
+		{name: "divide", input: "40h/5", want: "8h0m0s"},
+		{name: "divide", input: "1h/2", want: "30m0s"},
+		{name: "divide", input: "1h/12", want: "5m0s"},
+		{name: "divide", input: "1h/11", want: "5m27.272727272s"},
+
 		{name: "empty", input: "", want: "0s"},
 		{name: "missing operand", input: "0h+", want: "0s"},
 	}
@@ -116,7 +130,7 @@ func TestCalculator_Calculate_Panics(t *testing.T) {
 	tests := []testCase{
 		{name: "floating nanoseconds", input: "0,1ns", want: "floating point values for unit ns is not supported"},
 		{name: "unexpected character", input: "0hh", want: "unexpected character 'h'"},
-		{name: "floating nanoseconds", input: "0,,1s", want: "expected digit, but got ','"},
+		{name: "floating nanoseconds", input: "0,,1s", want: "unexpected character ','"},
 		{name: "missing end of term", input: ")", want: "unexpected closing parenthesis"},
 		{name: "unexpected end of term", input: ")1h", want: "unexpected closing parenthesis"},
 		{name: "missing begin of term", input: "1h)", want: "unexpected closing parenthesis"},
@@ -126,6 +140,13 @@ func TestCalculator_Calculate_Panics(t *testing.T) {
 		{name: "invalid operator", input: "--1h", want: "unexpected token 'MINUS'"},
 		{name: "invalid operator", input: "-+1h", want: "unexpected token 'PLUS'"},
 		{name: "parentheses", input: "1h(1h", want: "unexpected token 'EOF'"},
+		{name: "multiply 2 durations", input: "1h*1h", want: "cannot calculate 2 durations"},
+		{name: "divide 2 durations", input: "1h/1h", want: "cannot calculate 2 durations"},
+		{name: "divide 2 durations", input: "2/1m", want: "cannot divide by a duration"},
+		{name: "result is not duration", input: "2/1", want: "result is no duration"},
+		{name: "result is not duration", input: "2*1", want: "result is no duration"},
+		{name: "result is not duration", input: "1", want: "result is no duration"},
+		{name: "result is not duration", input: "1h+2+3", want: "result is no duration"},
 	}
 
 	for _, tt := range tests {
