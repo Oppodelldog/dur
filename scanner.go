@@ -10,6 +10,8 @@ const (
 	TypeWhitespace TokenType = "WHITESPACE"
 	TypePlus       TokenType = "PLUS"
 	TypeMinus      TokenType = "MINUS"
+	TypeMultiply   TokenType = "MULTIPLY"
+	TypeDivide     TokenType = "DIVIDE"
 	TypeParenOpen  TokenType = "PAREN_OPEN"
 	TypeParenClose TokenType = "PAREN_CLOSE"
 
@@ -21,6 +23,8 @@ const (
 const (
 	minus      = '-'
 	plus       = '+'
+	multiply   = '*'
+	divide     = '/'
 	space      = ' '
 	parenOpen  = '('
 	parenClose = ')'
@@ -113,6 +117,14 @@ func (s *Scanner) nextToken() Token {
 		s.nextChar()
 	case ch == plus:
 		tok = Token{Type: TypePlus}
+
+		s.nextChar()
+	case ch == multiply:
+		tok = Token{Type: TypeMultiply}
+
+		s.nextChar()
+	case ch == divide:
+		tok = Token{Type: TypeDivide}
 
 		s.nextChar()
 	case ch == parenOpen:
