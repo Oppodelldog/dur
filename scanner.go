@@ -10,10 +10,13 @@ const (
 	TypeWhitespace TokenType = "WHITESPACE"
 	TypePlus       TokenType = "PLUS"
 	TypeMinus      TokenType = "MINUS"
+	TypeMultiply   TokenType = "MULTIPLY"
+	TypeDivide     TokenType = "DIVIDE"
 	TypeParenOpen  TokenType = "PAREN_OPEN"
 	TypeParenClose TokenType = "PAREN_CLOSE"
 
-	TypeValue = "VALUE"
+	TypeDuration = "DURATION"
+	TypeInteger  = "INTEGER"
 
 	TypeEmpty = ""
 )
@@ -21,6 +24,8 @@ const (
 const (
 	minus      = '-'
 	plus       = '+'
+	multiply   = '*'
+	divide     = '/'
 	space      = ' '
 	parenOpen  = '('
 	parenClose = ')'
@@ -82,6 +87,10 @@ func (s *Scanner) nextChar() {
 	s.pos++
 }
 
+func (s *Scanner) prevChar() {
+	s.pos--
+}
+
 func (s *Scanner) read() byte {
 	if s.eof(0) {
 		panic(fmt.Sprintf("read out of bounds at pos: %v", s.pos))
@@ -113,6 +122,14 @@ func (s *Scanner) nextToken() Token {
 		s.nextChar()
 	case ch == plus:
 		tok = Token{Type: TypePlus}
+
+		s.nextChar()
+	case ch == multiply:
+		tok = Token{Type: TypeMultiply}
+
+		s.nextChar()
+	case ch == divide:
+		tok = Token{Type: TypeDivide}
 
 		s.nextChar()
 	case ch == parenOpen:
@@ -156,7 +173,7 @@ func (s *Scanner) readValue() Token {
 	sb.WriteByte(ch)
 
 loop:
-	for {
+	for !s.eof(0) {
 		ch = s.read()
 		switch {
 		case ch == umc:
@@ -190,11 +207,17 @@ loop:
 		case isDigit(ch):
 			sb.WriteByte(ch)
 		default:
-			panic(fmt.Sprintf("expected digit, but got '%s'", string(ch)))
+			s.prevChar()
+			break loop
 		}
 	}
 
-	return Token{Type: TypeValue, Literal: sb.String()}
+	var value = sb.String()
+	if isDigit(value[len(value)-1]) {
+		return Token{Type: TypeInteger, Literal: value}
+	}
+
+	return Token{Type: TypeDuration, Literal: value}
 }
 
 func isDigit(ch byte) bool {

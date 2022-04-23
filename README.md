@@ -31,6 +31,18 @@ dur is a program for calculation of durations.
 # units support
 > dur 1h1m1s1ms1us1ns
 1h1m1.001001001s
+
+# parentheses support
+> dur "2h-(1h30m)"
+30m0s
+
+# multiplication
+> dur 5*4*12*8h
+1920h0m0s
+
+# division
+> dur 40h/5
+8h0m0s
 ```
 
 ### verbose output
