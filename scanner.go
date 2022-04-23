@@ -15,7 +15,8 @@ const (
 	TypeParenOpen  TokenType = "PAREN_OPEN"
 	TypeParenClose TokenType = "PAREN_CLOSE"
 
-	TypeValue = "VALUE"
+	TypeDuration = "DURATION"
+	TypeInteger  = "INTEGER"
 
 	TypeEmpty = ""
 )
@@ -84,6 +85,10 @@ func (s *Scanner) peek(offset int) byte {
 
 func (s *Scanner) nextChar() {
 	s.pos++
+}
+
+func (s *Scanner) prevChar() {
+	s.pos--
 }
 
 func (s *Scanner) read() byte {
@@ -168,7 +173,7 @@ func (s *Scanner) readValue() Token {
 	sb.WriteByte(ch)
 
 loop:
-	for {
+	for !s.eof(0) {
 		ch = s.read()
 		switch {
 		case ch == umc:
@@ -202,11 +207,17 @@ loop:
 		case isDigit(ch):
 			sb.WriteByte(ch)
 		default:
-			panic(fmt.Sprintf("expected digit, but got '%s'", string(ch)))
+			s.prevChar()
+			break loop
 		}
 	}
 
-	return Token{Type: TypeValue, Literal: sb.String()}
+	var value = sb.String()
+	if isDigit(value[len(value)-1]) {
+		return Token{Type: TypeInteger, Literal: value}
+	}
+
+	return Token{Type: TypeDuration, Literal: value}
 }
 
 func isDigit(ch byte) bool {
