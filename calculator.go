@@ -113,7 +113,7 @@ func (i *Calculator) operand() time.Duration {
 	case TypeParenOpen:
 		i.pos++
 		return i.calculate(i.closingParen) * mod
-	case TypeValue:
+	case TypeDuration:
 		return i.duration() * mod
 	default:
 		panic(fmt.Sprintf("unexpected token '%v'", i.tokenType()))
