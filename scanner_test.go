@@ -16,7 +16,7 @@ func TestScanner_Tokens(t *testing.T) {
 	tests := []testCase{
 		{name: "empty input", input: "", want: []dur.Token{{Type: dur.TypeEOF}}},
 		{name: "operators", input: "+-", want: []dur.Token{{Type: dur.TypePlus}, {Type: dur.TypeMinus}, {Type: dur.TypeEOF}}},
-		{name: "parentheses", input: "()", want: []dur.Token{{Type: dur.TypeParenOpen}, {Type: dur.TypeParentClose}, {Type: dur.TypeEOF}}},
+		{name: "parentheses", input: "()", want: []dur.Token{{Type: dur.TypeParenOpen}, {Type: dur.TypeParenClose}, {Type: dur.TypeEOF}}},
 		{name: "hours", input: "12h", want: []dur.Token{{Type: dur.TypeValue, Literal: "12h"}, {Type: dur.TypeEOF}}},
 		{name: "minutes", input: "12m", want: []dur.Token{{Type: dur.TypeValue, Literal: "12m"}, {Type: dur.TypeEOF}}},
 		{name: "seconds", input: "12s", want: []dur.Token{{Type: dur.TypeValue, Literal: "12s"}, {Type: dur.TypeEOF}}},

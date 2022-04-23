@@ -5,22 +5,6 @@ import (
 	"time"
 )
 
-type options struct {
-	p printer
-}
-
-type Option func(o *options)
-
-func DiscardPrinter(o *options) {
-	o.p = discardPrinter{}
-}
-func HumanReadablePrinter(o *options) {
-	o.p = humanReadablePrinter{}
-}
-func NanoPrinter(o *options) {
-	o.p = nanoPrinter{}
-}
-
 type printer interface {
 	print(v1 time.Duration, v2 time.Duration, vr time.Duration, op string)
 }
@@ -46,60 +30,98 @@ type Calculator struct {
 	p      printer
 }
 
-func (i *Calculator) Calculate() string {
+func (i *Calculator) Calculate() time.Duration {
+	return i.calculate(i.eof)
+}
+
+func (i *Calculator) calculate(isEnd func() bool) time.Duration {
 	var (
 		v1 time.Duration
 		v2 time.Duration
 		op TokenType
 	)
 
-	if i.eof() {
-		return ""
+	if i.outOfRange() {
+		panic("out of range")
 	}
 
-	v1 = i.duration()
+	if isEnd() {
+		i.pos++
+		return time.Duration(0)
+	}
 
-	if i.eof() {
-		return v1.String()
+	v1 = i.operand()
+
+	if isEnd() {
+		i.pos++
+		return v1
 	}
 
 	for {
-		if i.eof() {
+		if i.outOfRange() {
+			panic("out of range")
+		}
+
+		if isEnd() {
+			i.pos++
 			break
 		}
 
-		if i.tokenType() == TypeValue {
-			if op == TypeEmpty {
-				op = TypePlus
-			}
-			v2 = i.duration()
-		} else {
-			op = i.operation()
-			v2 = i.duration()
+		if i.isOperator() && op == TypeEmpty {
+			op = i.operator()
+			continue
 		}
+
+		if op == TypeEmpty {
+			op = TypePlus
+		}
+
+		v2 = i.operand()
 
 		switch op {
 		case TypePlus:
 			vr := v1 + v2
 			i.p.print(v1, v2, vr, string(plus))
 			v1 = vr
+			op = TypeEmpty
 		case TypeMinus:
 			vr := v1 - v2
 			i.p.print(v1, v2, vr, string(minus))
 			v1 = vr
+			op = TypeEmpty
 		default:
-			panic(fmt.Sprintf("unknown operation '%v'", op))
+			panic(fmt.Sprintf("unknown operator '%v'", op))
 		}
 	}
 
-	return v1.String()
+	return v1
+}
+
+func (i *Calculator) operand() time.Duration {
+	var mod = time.Duration(1)
+
+	if i.tokenTypeEquals(TypeMinus) {
+		mod = time.Duration(-1)
+		i.pos++
+	} else if i.tokenTypeEquals(TypePlus) {
+		i.pos++
+	}
+
+	switch i.tokenType() {
+	case TypeParenClose:
+		panic("unexpected closing parenthesis")
+	case TypeParenOpen:
+		i.pos++
+		return i.calculate(i.closingParen) * mod
+	case TypeValue:
+		return i.duration() * mod
+	default:
+		panic(fmt.Sprintf("unexpected token '%v'", i.tokenType()))
+	}
 }
 
 func (i *Calculator) duration() time.Duration {
 	var tok = i.tokens[i.pos]
-	if tok.Type != TypeValue {
-		panic(fmt.Sprintf("expected value, but got %v (%v'')", tok.Type, tok.Literal))
-	}
 
 	dur := parseDuration(tok.Literal)
 
@@ -108,20 +130,34 @@ func (i *Calculator) duration() time.Duration {
 	return dur
 }
 
-func (i *Calculator) operation() TokenType {
+func (i *Calculator) operator() TokenType {
 	var tok = i.tokens[i.pos]
-	if tok.Type != TypePlus && tok.Type != TypeMinus {
-		panic(fmt.Sprintf("expected operation, but got %v ('%v')", tok.Type, tok.Literal))
-	}
+
 	i.pos++
 
 	return tok.Type
 }
 
+func (i *Calculator) outOfRange() bool {
+	return len(i.tokens) <= i.pos
+}
+
 func (i *Calculator) eof() bool {
-	return i.tokens[i.pos].Type == TypeEOF
+	return i.tokenTypeEquals(TypeEOF)
+}
+
+func (i *Calculator) closingParen() bool {
+	return i.tokenTypeEquals(TypeParenClose)
+}
+
+func (i *Calculator) tokenTypeEquals(tokenType TokenType) bool {
+	return i.tokenType() == tokenType
 }
 
 func (i *Calculator) tokenType() TokenType {
 	return i.tokens[i.pos].Type
+}
+
+func (i *Calculator) isOperator() bool {
+	return i.tokenTypeEquals(TypeMinus) || i.tokenTypeEquals(TypePlus)
 }

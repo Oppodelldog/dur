@@ -6,12 +6,12 @@ import (
 )
 
 const (
-	TypeEOF         TokenType = "EOF"
-	TypeWhitespace  TokenType = "WHITESPACE"
-	TypePlus        TokenType = "PLUS"
-	TypeMinus       TokenType = "MINUS"
-	TypeParenOpen   TokenType = "PAREN_OPEN"
-	TypeParentClose TokenType = "PAREN_CLOSE"
+	TypeEOF        TokenType = "EOF"
+	TypeWhitespace TokenType = "WHITESPACE"
+	TypePlus       TokenType = "PLUS"
+	TypeMinus      TokenType = "MINUS"
+	TypeParenOpen  TokenType = "PAREN_OPEN"
+	TypeParenClose TokenType = "PAREN_CLOSE"
 
 	TypeValue = "VALUE"
 
@@ -120,7 +120,7 @@ func (s *Scanner) nextToken() Token {
 
 		s.nextChar()
 	case ch == parenClose:
-		tok = Token{Type: TypeParentClose}
+		tok = Token{Type: TypeParenClose}
 
 		s.nextChar()
 	case isDigit(ch):
