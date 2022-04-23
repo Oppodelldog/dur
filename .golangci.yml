@@ -19,7 +19,6 @@ linters:
     - staticcheck
     - nestif
     - goerr113
-    - gocritic
     - bodyclose
     - structcheck
     - wsl
