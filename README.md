@@ -1,16 +1,13 @@
 # dur
 
-dur is a program for calculation of durations.
+dur is a CLI tool for calculation of durations.
+
+![DUR](dur.png)
 
 ## Installation
-
-```make install```
-
-**without make:**
-
+with go installed run:
 ```bash
-    > go build -o dur cmd/main.go
-    > mv dur $GOPATH/bin/dur
+go install github.com/Oppodelldog/dur@latest
 ```
 
 ## Usage

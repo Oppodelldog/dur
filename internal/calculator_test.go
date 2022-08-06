@@ -1,7 +1,7 @@
-package dur_test
+package internal_test
 
 import (
-	"dur"
+	"github.com/Oppodelldog/dur/internal"
 	"reflect"
 	"testing"
 )
@@ -113,7 +113,7 @@ func TestCalculator_Calculate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := dur.NewCalculator(tt.input).Calculate().String(); !reflect.DeepEqual(got, tt.want) {
+			if got := internal.NewCalculator(tt.input).Calculate().String(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Calculate() = %v, want %v", got, tt.want)
 			}
 		})
@@ -161,7 +161,7 @@ func TestCalculator_Calculate_Panics(t *testing.T) {
 					}
 
 				}()
-				if got := dur.NewCalculator(tt.input).Calculate(); !reflect.DeepEqual(got, tt.want) {
+				if got := internal.NewCalculator(tt.input).Calculate(); !reflect.DeepEqual(got, tt.want) {
 					t.Errorf("Calculate() = %v, want %v", got, tt.want)
 				}
 			}()

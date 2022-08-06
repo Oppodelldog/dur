@@ -1,4 +1,4 @@
-package dur
+package internal
 
 import (
 	"fmt"

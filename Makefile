@@ -2,10 +2,6 @@
 build: clean ## builds dur
 	go build -o dur cmd/main.go
 
-.PHONY: install
-install: build ## builds dur and moves it into the go bin folder
-	mv dur $$GOPATH/bin/dur
-
 .PHONY: clean  ## cleans previously built files
 clean:
 	rm -f dur

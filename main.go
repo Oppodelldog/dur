@@ -1,16 +1,16 @@
 package main
 
 import (
-	"dur"
 	"flag"
 	"fmt"
+	"github.com/Oppodelldog/dur/internal"
 	"os"
 	"strings"
 )
 
 func main() {
 	var (
-		options []dur.Option
+		options []internal.Option
 		fs      = flag.NewFlagSet("dur", flag.ExitOnError)
 		printer = fs.String("p", "", "prints a line for each calculation that is performed.\nOutput options:\n  h - human readable\n  n - nanoseconds\nexample: -p=h")
 	)
@@ -27,12 +27,12 @@ func main() {
 
 	switch *printer {
 	case "h":
-		options = append(options, dur.HumanReadablePrinter)
+		options = append(options, internal.HumanReadablePrinter)
 	case "n":
-		options = append(options, dur.NanoPrinter)
+		options = append(options, internal.NanoPrinter)
 	}
 
-	fmt.Println(dur.NewCalculator(input, options...).Calculate())
+	fmt.Println(internal.NewCalculator(input, options...).Calculate())
 }
 
 func usage(fs *flag.FlagSet) func() {
